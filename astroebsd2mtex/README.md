@@ -20,7 +20,7 @@ cs = {'notIndexed',...
 
 % Read data from file
 pname = ['/path/to/datfile/'];
-fname = [pname 'datafile_mtex.dat'];
+fname = [pname 'datfile_mtex.dat'];
 
 ebsd = loadEBSD(fname,cs,'convertEuler2SpatialReferenceFrame','ColumnNames',...
     {'x' 'y' 'euler1' 'euler2' 'euler3' 'pq' 'ps' 'mae' 'bn' 'phase'});

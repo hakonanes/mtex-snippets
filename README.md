@@ -4,6 +4,6 @@ A collection of scripts I find useful when analysing orientation data in [MTEX](
 
 ## Contents
 
-### astroebsd2mtex
+### [astroebsd2mtex](astroebsd2mtex/)
 
 Write output data from an AstroEBSD MAT-file to a format readable by MTEX.
