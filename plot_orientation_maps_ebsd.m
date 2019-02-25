@@ -1,6 +1,6 @@
 function plot_orientation_maps_ebsd(file,varargin)
-% PLOT_ORIENTATION_MAPS_EBSD Plot orientation maps from EBSD data and write
-% them to file.
+% PLOT_ORIENTATION_MAPS_EBSD Plot orientation maps and/or inverse pole figure
+% density plots from EBSD data and write them to file.
 %
 % Input
 %  file - string with full path to the .ANG file.
@@ -12,11 +12,15 @@ function plot_orientation_maps_ebsd(file,varargin)
 %  filter - indexing quality metric to filter values by (default is no
 %  filtering).
 %  filterVal - value to filter by.
+%
+% Assumes the following specimen directions for package types:
+%   * oim: Xeuler = image east, Zeuler = out of image
+%   * astroebsd: Xeuler = image north, Zeuler = into image
 % 
+% Assumes not indexed pixels are labeled 'notIndexed'.
+%
 % Requires the export_fig package
 % (https://se.mathworks.com/matlabcentral/fileexchange/23629-export_fig).
-%
-% Assumes not indexed pixels are labeled 'notIndexed'.
 %
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-02-25
 
