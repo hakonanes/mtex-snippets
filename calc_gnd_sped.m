@@ -1,4 +1,4 @@
-function calc_gnd_sped(file,cs,gnd_range)
+function calc_gnd_sped(file,varargin)
 % CALC_GND_SPED Convenience function for estimating geometrically necessary
 % dislocation (GND) densities from orientation data obtained from (scanning)
 % precession electron diffraction (S)PED patterns. Plots and writes a GND
@@ -6,6 +6,8 @@ function calc_gnd_sped(file,cs,gnd_range)
 %
 % Input
 %  file - string with full path of input file.
+%
+% Options
 %  cs - cell array with crystal symmetries (default is notIndexed and Al).
 %  gnd_range - plotting range for GND densities.
 %
@@ -17,14 +19,16 @@ function calc_gnd_sped(file,cs,gnd_range)
 %
 % Created by Håkon W. Ånes (hakon.w.anes@ntnu.no), 2019-02-25
 
-% Crystal and specimen symmetry
-if ~exist('cs','var')
-    cs = {'notIndexed',crystalSymmetry('m-3m',[4.04 4.04 4.04],'mineral','Al')};
-end
+% Set default values
+cs = {'notIndexed',crystalSymmetry('m-3m',[4.04 4.04 4.04],'mineral','Al')};
+gnd_range = [1e14,1e16];
 
-% Set GND range if not input
-if ~exist('gnd_range','var')
-    gnd_range = [1e14,1e16];
+% Override default values if passed to function
+if check_option(varargin,'cs')
+    cs = get_option(varargin,'cs');
+end
+if check_option(varargin,'gnd_range')
+    gnd_range = get_option(varargin,'gnd_range');
 end
 
 % Set specimen directions

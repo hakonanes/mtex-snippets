@@ -1,9 +1,11 @@
-function ebsd_check_quality(file,type,cs)
+function ebsd_check_quality(file,varargin)
 % EBSD_CHECK_QUALITY Check quality of indexing of Kikuchi diffraction
 % patterns.
 %
 % Input
-%  file - string with full path of input file.
+%  file - string with full path to the .ANG file.
+%
+% Options
 %  type - string, {'oim' (default) or 'astroebsd'}.
 %  cs - cell array with crystal symmetries (default is notIndexed and Al).
 %
@@ -19,12 +21,23 @@ function ebsd_check_quality(file,type,cs)
 %
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-02-21
 
-if ~exist('type','var'), type = 'oim'; end
+% Set default values
+type = 'oim';
+cs = {'notIndexed',crystalSymmetry('m-3m',[4.04 4.04 4.04],'mineral','Al')};
 
-% Crystal symmetry
-if ~exist('cs','var')
-    cs = {'notIndexed',crystalSymmetry('m-3m',[4.04 4.04 4.04],'mineral','Al')};
+% Override default values if passed to function
+if check_option(varargin,'type')
+    type = get_option(varargin,'type');
 end
+if check_option(varargin,'cs')
+    cs = get_option(varargin,'cs');
+end
+
+% To show figures or not
+set(0,'DefaultFigureVisible','off')
+
+% Image resolution
+res = '-r200';
 
 % Set specimen directions
 if strcmp(type,'oim')
@@ -34,12 +47,6 @@ else % astroebsd
     setMTEXpref('xAxisDirection','north');
     setMTEXpref('zAxisDirection','intoPlane');
 end
-
-% To show figures or not
-set(0,'DefaultFigureVisible','off')
-
-% Image resolution
-res = '-r200';
 
 % Read data from file
 [path,~,~] = fileparts(file);
