@@ -65,7 +65,6 @@ if size(ebsd, 2) > 1
     ebsd.y = reshape(ebsd.y, new_shape);
     ebsd.iq = reshape(ebsd.iq, new_shape);
     ebsd.ci = reshape(ebsd.ci, new_shape);
-    ebsd.phase = reshape(ebsd.phase, new_shape);
     ebsd.fit = reshape(ebsd.fit, new_shape);
     ebsd.sem_signal = reshape(ebsd.sem_signal, new_shape);
     ebsd.unknown1 = reshape(ebsd.unknown1, new_shape);
@@ -74,7 +73,8 @@ if size(ebsd, 2) > 1
     ebsd.unknown4 = reshape(ebsd.unknown4, new_shape);
 end
 
-% Create matrix with relevant values
+% Create matrix with relevant values (cannot get phase data to reshape if
+% gridified?)
 m = [ebsd.rotations.phi1'; ebsd.rotations.Phi';...
     ebsd.rotations.phi2';ebsd.x'; ebsd.y'; ebsd.iq'; ebsd.ci';...
     reshape(ebsd.phase, new_shape)';ebsd.sem_signal';ebsd.fit';...

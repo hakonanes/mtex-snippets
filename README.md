@@ -23,16 +23,3 @@ Plot orientation maps and/or inverse pole figure density plots from EBSD data an
 ### export2ang
 
 Create a new TSL .ang file from an @EBSD object by copying the original .ang file header and exporting the object's data to the file.
-
-
-%
-% Input
-%  ebsd - @EBSD object
-%  old_ang - string of original .ang file to copy header from
-%
-% Options
-%  fout - string of file name (without extension) of output .ang file
-%  rotation - {'convertEuler2SpatialReferenceFrame',
-%  'convertSpatial2EulerReferenceFrame'}. If orientation data was rotated when
-%  imported, by using either of the above options, the data is rotated back
-%  before exported if any of the options above are passed.
