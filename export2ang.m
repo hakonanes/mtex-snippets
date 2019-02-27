@@ -42,8 +42,8 @@ elseif check_option(varargin,'convertEuler2SpatialReferenceFrame')
         -180*degree), 'keepXY');
 end
     
-% Check if data set contains not indexed pixels
-if ~isempty(ebsd(ebsd.phase == -1))
+% Check if data set contains not indexed pixels and those values are set to NaN
+if ~isempty(ebsd(ebsd.phase == -1)) && isnan(ebsd(ebsd.phase == -1).ci(1))
     notIndexed = ebsd(ebsd.phase == -1);
     notIndexed.rotations = orientation('Euler',12.56637,12.56637,12.56637);
     notIndexed.ci = -1;
@@ -81,8 +81,8 @@ m = [ebsd.rotations.phi1'; ebsd.rotations.Phi';...
     ebsd.unknown1'; ebsd.unknown2';ebsd.unknown3'; ebsd.unknown4'];
 
 % Write matrix to file
-tsl_format = ['  %8.5f   %8.5f   %8.5f   %10.5f   %10.5f   %10.3f   %+4.3f'...
-    '   %i   %+i   %7.3f   %7.5f   %7.5f   %7.5f   %7.5f\n'];
+tsl_format = ['  %8.5f   %8.5f   %8.5f   %10.5f   %10.5f   %10.3f   %6.3f'...
+    '   %2i   %2i   %7.3f   %7.5f   %7.5f   %7.5f   %7.5f\n'];
 fprintf(fido, tsl_format, m);
 
 % Close output file
