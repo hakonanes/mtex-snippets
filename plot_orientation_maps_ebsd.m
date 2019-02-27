@@ -1,4 +1,4 @@
-function plot_orientation_maps_ebsd(file,varargin)
+function plot_orientation_maps_ebsd(file,options)
 % PLOT_ORIENTATION_MAPS_EBSD Plot orientation maps and/or inverse pole figure
 % density plots from EBSD data and write them to file.
 %
@@ -32,20 +32,20 @@ filter = 0;
 filterVal = 0;
 
 % Override default values if passed to function
-if check_option(varargin,'type')
-    type = get_option(varargin,'type');
+if check_option(options,'type')
+    type = get_option(options,'type');
 end
-if check_option(varargin,'cs')
-    cs = get_option(varargin,'cs');
+if check_option(options,'cs')
+    cs = get_option(options,'cs');
 end
-if check_option(varargin,'mode')
-    mode = get_option(varargin,'mode');
+if check_option(options,'mode')
+    mode = get_option(options,'mode');
 end
-if check_option(varargin,'filter')
-    filter = get_option(varargin,'filter');
+if check_option(options,'filter')
+    filter = get_option(options,'filter');
 end
-if check_option(varargin,'filterVal')
-    filterVal = get_option(varargin,'filterVal');
+if check_option(options,'filterVal')
+    filterVal = get_option(options,'filterVal');
 end
 
 % Figure options

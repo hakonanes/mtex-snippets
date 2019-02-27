@@ -1,4 +1,4 @@
-function ebsd_check_quality(file,varargin)
+function ebsd_check_quality(file,options)
 % EBSD_CHECK_QUALITY Check quality of indexing of Kikuchi diffraction
 % patterns.
 %
@@ -26,11 +26,11 @@ type = 'oim';
 cs = {'notIndexed',crystalSymmetry('m-3m',[4.04 4.04 4.04],'mineral','Al')};
 
 % Override default values if passed to function
-if check_option(varargin,'type')
-    type = get_option(varargin,'type');
+if check_option(options,'type')
+    type = get_option(options,'type');
 end
-if check_option(varargin,'cs')
-    cs = get_option(varargin,'cs');
+if check_option(options,'cs')
+    cs = get_option(options,'cs');
 end
 
 % To show figures or not
