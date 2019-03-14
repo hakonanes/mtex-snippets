@@ -24,14 +24,15 @@ data = load(MATFilename);
 [rows,cols] = size(data.Data_InputMap.XSample);
 
 % Create header and matrix of data
+degree = 0.0175;
 fileHeader = ['x\ty\t\tphi1\t\tPhi\t\t\tphi2\t\tpq\t\t\tps\t\t\tmae\t\tbn'...
     '\tphase\r\n'];
 dataMat = [...
     reshape(data.Data_InputMap.XSample,rows*cols,1)...     % X sample position
     reshape(data.Data_InputMap.YSample,rows*cols,1)...     % Y sample position
-    reshape(data.Data_OutputMap.phi1,rows*cols,1)...       % phi1
-    reshape(data.Data_OutputMap.PHI,rows*cols,1)...        % Phi
-    reshape(data.Data_OutputMap.phi2,rows*cols,1)...       % phi2
+    reshape(data.Data_OutputMap.phi1/degree,rows*cols,1)...% phi1
+    reshape(data.Data_OutputMap.PHI/degree,rows*cols,1)... % Phi
+    reshape(data.Data_OutputMap.phi2/degree,rows*cols,1)...% phi2
     reshape(data.Data_OutputMap.IQ,rows*cols,1)...         % Pattern quality
     reshape(data.Data_OutputMap.BQ,rows*cols,1)...         % Pattern slope
     reshape(data.Data_OutputMap.Err,rows*cols,1)...        % Mean Angular Error
