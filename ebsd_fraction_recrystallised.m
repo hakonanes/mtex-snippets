@@ -72,7 +72,7 @@ if check_option(varargin, 'overlay_cmap')
     overlay_cmap = get_option(varargin, 'overlay_cmap');
 end
 
-% Assign ECD and fractionHAGB properties if they do not exist
+% Assign ECD and Xhab properties if they do not exist
 properties = grains.prop;
 if ~isfield(properties, 'ECD')
     grains('indexed').prop.ECD = 0.816*2*grains('indexed').equivalentRadius;
