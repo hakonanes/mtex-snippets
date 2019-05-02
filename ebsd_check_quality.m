@@ -1,20 +1,21 @@
-function ebsd_check_quality(file,options)
+function ebsd_check_quality(ebsd, out_path, varargin)
 % EBSD_CHECK_QUALITY Check quality of indexing of Kikuchi diffraction
 % patterns.
 %
 % Input
-%  file - string with full path to the .ANG file.
+%  ebsd - @EBSD object
+%  out_path - path to output directory
 %
 % Options
-%  type - string, {'oim' (default) or 'astroebsd'}.
-%  cs - cell array with crystal symmetries (default is notIndexed and Al).
+%  type - string, {'ang' (default), 'osc' or 'astro'}.
+%  plot - if passed, show plots. If not passed, do not show plots (default).
 %
 % Assumes the indexing data file from AstroEBSD is created with the
 % astroebsd2mtex script found here (https://github.com/hwagit/mtex-snippets).
 % 
-% Assumes the following specimen directions for package types:
-%   * astroebsd: Xeuler = image north, Zeuler = into image
-%   * oim: Xeuler = image east, Zeuler = out of image
+% Assumes the following Euler directions for package types:
+%   * ang: Xeuler = image east, Zeuler = into image
+%   * osc/astro: Xeuler = image north, Zeuler = into image
 %
 % Requires the export_fig package to write figures to file
 % (https://se.mathworks.com/matlabcentral/fileexchange/23629-export_fig).
@@ -22,102 +23,98 @@ function ebsd_check_quality(file,options)
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-02-21
 
 % Set default values
-type = 'oim';
-cs = {'notIndexed',crystalSymmetry('m-3m',[4.04 4.04 4.04],'mineral','Al')};
+type = 'ang';
 
 % Override default values if passed to function
-if check_option(options,'type')
-    type = get_option(options,'type');
-end
-if check_option(options,'cs')
-    cs = get_option(options,'cs');
+if check_option(varargin, 'type')
+    type = get_option(varargin, 'type');
 end
 
 % To show figures or not
-set(0,'DefaultFigureVisible','off')
+set(0, 'DefaultFigureVisible', 'on')
+if ~check_option(varargin, 'plot')
+    set(0, 'DefaultFigureVisible', 'off')
+end
 
 % Image resolution
 res = '-r200';
 
 % Set specimen directions
-if strcmp(type,'oim')
-    setMTEXpref('xAxisDirection','east');
-    setMTEXpref('zAxisDirection','outOfPlane');
-else % astroebsd
-    setMTEXpref('xAxisDirection','north');
-    setMTEXpref('zAxisDirection','intoPlane');
-end
-
-% Read data from file
-[path,~,~] = fileparts(file);
-
-% Read data
-if strcmp(type,'oim')
-    ebsd = loadEBSD(file,cs,'interface','ang',...
-        'convertSpatial2EulerReferenceFrame');
-else % astroebsd
-    ebsd = loadEBSD(file,cs,'ColumnNames',...
-        {'x' 'y' 'euler1' 'euler2' 'euler3' 'pq' 'ps' 'mae' 'bn' 'phase'});
+if strcmp(type, 'ang') || strcmp(type, 'osc')
+    setMTEXpref('xAxisDirection', 'north');
+    setMTEXpref('zAxisDirection', 'intoPlane');
+else % astro
+    setMTEXpref('xAxisDirection', 'north');
+    setMTEXpref('zAxisDirection', 'intoPlane');
 end
 
 % Write mean values for index and reliability to file
-fid = fopen(fullfile(path,'ebsd_quality.dat'),'w');
-if strcmp(type,'astroebsd')
-    fprintf(fid,'pq\t\tps\t\tmae\t\tbn\n%.4f\t%.4f\t%.4f\t%.4f',...
-        nanmean(ebsd.pq),nanmean(ebsd.ps),nanmean(ebsd.mae)/degree,...
+fid = fopen(fullfile(out_path, 'ebsd_quality.dat'), 'w');
+if strcmp(type, 'ang')
+    fprintf(fid, 'iq\t\tci\t\tfitn\n%.4f\t%.4f\t%.4f', nanmean(ebsd.iq),...
+        nanmean(ebsd.ci), nanmean(ebsd.fit));
+elseif strcmp(type, 'osc')
+    fprintf(fid, 'iq\t\tci\t\tfit\n%.4f\t%.4f\t%.4f',...
+        nanmean(ebsd.imagequality), nanmean(ebsd.confidenceindex),...
+        nanmean(ebsd.fit));
+else % astro
+    fprintf(fid, 'pq\t\tps\t\tmae\t\tbn\n%.4f\t%.4f\t%.4f\t%.4f',...
+        nanmean(ebsd.pq), nanmean(ebsd.ps), nanmean(ebsd.mae)/degree,...
         nanmean(ebsd.bn));
-else % oim
-    fprintf(fid,'iq\t\tci\t\tfitn\n%.4f\t%.4f\t%.4f',nanmean(ebsd.iq),...
-        nanmean(ebsd.ci),nanmean(ebsd.fit));
 end
 fclose(fid);
 
 % Plot pattern quality
 figure
-if strcmp(type,'astroebsd')
-    plot(ebsd,ebsd.pq)
-    fname = 'quality_pq.png';
-else % oim
-    plot(ebsd,ebsd.iq)
+if strcmp(type, 'ang')
+    plot(ebsd, ebsd.iq)
     fname = 'quality_iq.png';
+elseif strcmp(type, 'osc')
+    plot(ebsd, ebsd.imagequality)
+    fname = 'quality_iq.png';
+else % astro
+    plot(ebsd, ebsd.pq)
+    fname = 'quality_pq.png';
 end
 mtexColorMap black2white
 mtexColorbar
-export_fig(fullfile(path,fname),res);
+export_fig(fullfile(out_path, fname), res);
 
 % Plot confidence index
 figure
-if strcmp(type,'astroebsd')
-    plot(ebsd,ebsd.ps)
-    fname = 'quality_ps.png';
-else % oim
-    plot(ebsd,ebsd.ci)
+if strcmp(type, 'ang')
+    plot(ebsd, ebsd.ci)
     fname = 'quality_ci.png';
+elseif strcmp(type, 'osc')
+    plot(ebsd, ebsd.confidenceindex)
+    fname = 'quality_ci.png';
+else % astro
+    plot(ebsd, ebsd.ps)
+    fname = 'quality_ps.png';
 end
 mtexColorMap black2white
 mtexColorbar
-export_fig(fullfile(path,fname),res);
+export_fig(fullfile(out_path, fname), res);
 
 % Plot pattern fit
 figure
-if strcmp(type,'astroebsd')
-    plot(ebsd,ebsd.mae)
+if strcmp(type, 'astro')
+    plot(ebsd, ebsd.mae)
     fname = 'quality_mae.png';
-else % oim
-    plot(ebsd,ebsd.fit)
+else % ang or osc
+    plot(ebsd, ebsd.fit)
     fname = 'quality_fit.png';
 end
 mtexColorMap white2black
 mtexColorbar
-export_fig(fullfile(path,fname),res);
+export_fig(fullfile(out_path, fname), res);
 
 % Plot kernel average misorientation
-kam = KAM(ebsd,'threshold',2*degree);
+kam = KAM(ebsd, 'threshold', 2*degree);
 
 figure
 plot(ebsd,kam./degree)
-mtexColorMap LaboTeX
 mtexColorbar
-export_fig(fullfile(path,'quality_kam.png'),res);
+export_fig(fullfile(out_path, 'quality_kam.png'), res);
 
 end
