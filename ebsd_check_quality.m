@@ -8,7 +8,7 @@ function ebsd_check_quality(ebsd, out_path, varargin)
 %
 % Options
 %  type - string, {'ang' (default), 'osc' or 'astro'}.
-%  plot - if passed, show plots. If not passed, do not show plots (default).
+%  to_plot - bool, if 1 (default), show plots and not just save them.
 %
 % Assumes the indexing data file from AstroEBSD is created with the
 % astroebsd2mtex script found here (https://github.com/hwagit/mtex-snippets).
@@ -24,6 +24,7 @@ function ebsd_check_quality(ebsd, out_path, varargin)
 
 % Set default values
 type = 'ang';
+to_plot = 1;
 
 % Override default values if passed to function
 if check_option(varargin, 'type')
@@ -32,7 +33,7 @@ end
 
 % To show figures or not
 set(0, 'DefaultFigureVisible', 'on')
-if ~check_option(varargin, 'plot')
+if ~to_plot
     set(0, 'DefaultFigureVisible', 'off')
 end
 
