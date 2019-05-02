@@ -1,4 +1,4 @@
-function [ebsd_new] = ebsd_denoise(ebsd, filter, varargin)
+wrfunction [ebsd_new] = ebsd_denoise(ebsd, filter, varargin)
 % EBSD_DENOISE Denoise EBSD data following these steps:
 %   1. Reconstruct grains (including the smallest grains in the bigger grains
 %   based upon a given minimum pixel threshold) with a given misorientation
@@ -27,7 +27,7 @@ function [ebsd_new] = ebsd_denoise(ebsd, filter, varargin)
 %  minPx - int, minimum grain size in pixels.
 %
 % Returns
-%  ebsd_new - @EBSD object.
+%  ebsd_new - Denoised @EBSD object.
 % 
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-05-02.
 
@@ -106,8 +106,8 @@ if to_plot
     mtexTitle('EBSD after 1st denoising')
     
     % Separate LABs and HABs
-    gbal = grains('indexed').boundary('indexed', 'indexed');
-    mAngles = gbal.misorientation.angle./degree;
+    gb = grains('indexed').boundary('indexed', 'indexed');
+    mAngles = gb.misorientation.angle./degree;
     maxmori = max(mAngles);
     hagb = 15;
     [~, ~, gbid] = histcounts(mAngles, 'NumBins', 2, 'BinEdges',...
@@ -117,8 +117,8 @@ if to_plot
     figure
     plot(ebsd_new('indexed'), ebsd_new('indexed').orientations)
     hold on
-    plot(gbal(gbid==1), 'linecolor', [0.7 0.7 0.7], 'linewidth', 1)
-    plot(gbal(gbid==2), 'linecolor', [0 0 0], 'linewidth', 1)
+    plot(gb(gbid==1), 'linecolor', [0.7 0.7 0.7], 'linewidth', 1)
+    plot(gb(gbid==2), 'linecolor', [0 0 0], 'linewidth', 1)
     plot(grains('notindexed'), grains('notindexed').GOS, 'facecolor', 'k')
     mtexTitle('EBSD and GBs after 2nd denoising')
     hold off

@@ -1,4 +1,4 @@
-function sped_calc_gnd(file,varargin)
+function sped_calc_gnd(file, varargin)
 % CALC_GND_SPED Convenience function for estimating geometrically necessary
 % dislocation (GND) densities from orientation data obtained from (scanning)
 % precession electron diffraction (S)PED patterns. Plots and writes a GND
