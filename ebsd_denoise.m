@@ -1,4 +1,4 @@
-wrfunction [ebsd_new] = ebsd_denoise(ebsd, filter, varargin)
+function [ebsd_new] = ebsd_denoise(ebsd, filter, varargin)
 % EBSD_DENOISE Denoise EBSD data following these steps:
 %   1. Reconstruct grains (including the smallest grains in the bigger grains
 %   based upon a given minimum pixel threshold) with a given misorientation

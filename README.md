@@ -4,27 +4,27 @@ A collection of scripts and convenience functions I use for processing and analy
 
 ## Contents
 
-### astroebsd2mtex
+### astroebsd2mtex.m
 
 Write output data from an AstroEBSD .mat-file to a format readable by MTEX.
 
-### sped_calc_gnd
+### sped_calc_gnd.m
 
 Convenience function for estimating geometrically necessary dislocation (GND) densities from orientation data obtained from (scanning) precession electron diffraction (S)PED patterns. Plots and writes a GND density map and writes the data to a new file.
 
-### export2ang
+### export2ang.m
 
 Create a new TSL .ang file from an `@EBSD` object by copying the original .ang file header and exporting the object's data to the file.
 
-### ebsd_check_quality
+### ebsd_check_quality.m
 
 Check quality of indexing of EBSD data.
 
-### ebsd_plot_orientation_maps
+### ebsd_plot_orientation_maps.m
 
 Plot orientation maps and/or inverse pole figure density plots from EBSD data and write them to file.
 
-### ebsd_denoise
+### ebsd_denoise.m
 
 Denoise EBSD data following these steps:
   1. Reconstruct grains (including the smallest grains in the bigger grains based upon a given minimum pixel threshold) with a given misorientation angle threshold (mat).
@@ -40,7 +40,7 @@ The script assumes that:
 
 Calculate the fraction of each grain's boundary that has a given high angle misorientation to its surrounding grains. Returns a new `@grain2d` object, containing only indexed grains, with a `Xhab` property. Can also plot a map of grains with grain colour corresponding to `Xhab`.
 
-### ebsd_fraction_recrystallised
+### ebsd_fraction_recrystallised.m
 
 Determine if a grain is recrystallised or not based upon three criteria:
   1. A minimum equivalent circular diameter.
@@ -62,3 +62,7 @@ Example usage:
 [grains, sub, rx] = ebsd_fraction_recrystallised(grains, 'ebsd', ebsd,...
     'overlay_metric', ebsd.fit, 'overlay_cmap', 2);
 ```
+
+### ebsd_write_data_to_file
+
+A collection of functions writing data (for example grain data) to .csv files.
