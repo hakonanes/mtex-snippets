@@ -7,15 +7,19 @@ function ebsd_check_quality(ebsd, out_path, varargin)
 %  out_path - path to output directory
 %
 % Options
-%  type - string, {'ang' (default), 'osc' or 'astro'}.
+%  save - bool, if 1 (default), write figures to file.
+%  type - string, {'ang' (default), 'osc', 'astro' or 'emsoft'}.
 %  to_plot - bool, if 1 (default), show plots and not just save them.
+%  scalebar - bool, if 1 (default), show a scalebar.
+%  colorbar - bool, if 1 (default), show colorbar.
 %
 % Assumes the indexing data file from AstroEBSD is created with the
 % astroebsd2mtex script found here (https://github.com/hwagit/mtex-snippets).
 % 
 % Assumes the following Euler directions for package types:
-%   * ang: Xeuler = image east, Zeuler = into image
-%   * osc/astro: Xeuler = image north, Zeuler = into image
+%   * ang/astro: Xeuler = image north, Zeuler = into image.
+%   * osc: Xeuler = image east, Zeuler = into image.
+%   * emsoft: Xeuler = image south, Zeuler = out of image.
 %
 % Requires the export_fig package to write figures to file
 % (https://se.mathworks.com/matlabcentral/fileexchange/23629-export_fig).
@@ -23,12 +27,27 @@ function ebsd_check_quality(ebsd, out_path, varargin)
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-02-21
 
 % Set default values
+save = 1;
 type = 'ang';
 to_plot = 1;
+scalebar = 1;
+colorbar = 1;
 
 % Override default values if passed to function
+if check_option(varargin, 'save')
+    save = get_option(varargin, 'save');
+end
 if check_option(varargin, 'type')
     type = get_option(varargin, 'type');
+end
+if check_option(varargin, 'to_plot')
+    to_plot = get_option(varargin, 'to_plot');
+end
+if check_option(varargin, 'scalebar')
+    scalebar = get_option(varargin, 'scalebar');
+end
+if check_option(varargin, 'colorbar')
+    colorbar = get_option(varargin, 'colorbar');
 end
 
 % To show figures or not
@@ -41,81 +60,120 @@ end
 res = '-r200';
 
 % Set specimen directions
-if strcmp(type, 'ang') || strcmp(type, 'osc')
+if ismember(type, {'ang', 'astro'})
     setMTEXpref('xAxisDirection', 'north');
     setMTEXpref('zAxisDirection', 'intoPlane');
-else % astro
-    setMTEXpref('xAxisDirection', 'north');
+elseif strcmp(type, 'osc')
+    setMTEXpref('xAxisDirection', 'east');
     setMTEXpref('zAxisDirection', 'intoPlane');
+else % emsoft
+    setMTEXpref('xAxisDirection', 'south');
+    setMTEXpref('zAxisDirection', 'outOfPlane');
 end
 
 % Write mean values for index and reliability to file
-fid = fopen(fullfile(out_path, 'ebsd_quality.dat'), 'w');
-if strcmp(type, 'ang')
-    fprintf(fid, 'iq\t\tci\t\tfitn\n%.4f\t%.4f\t%.4f', nanmean(ebsd.iq),...
-        nanmean(ebsd.ci), nanmean(ebsd.fit));
-elseif strcmp(type, 'osc')
-    fprintf(fid, 'iq\t\tci\t\tfit\n%.4f\t%.4f\t%.4f',...
-        nanmean(ebsd.imagequality), nanmean(ebsd.confidenceindex),...
-        nanmean(ebsd.fit));
-else % astro
-    fprintf(fid, 'pq\t\tps\t\tmae\t\tbn\n%.4f\t%.4f\t%.4f\t%.4f',...
-        nanmean(ebsd.pq), nanmean(ebsd.ps), nanmean(ebsd.mae)/degree,...
-        nanmean(ebsd.bn));
+if save
+    fid = fopen(fullfile(out_path, 'ebsd_quality.dat'), 'w');
+    if strcmp(type, 'ang')
+        fprintf(fid, 'iq\t\tci\t\tfitn\n%.4f\t%.4f\t%.4f', nanmean(ebsd.iq),...
+            nanmean(ebsd.ci), nanmean(ebsd.fit));
+    elseif strcmp(type, 'osc')
+        fprintf(fid, 'iq\t\tci\t\tfit\n%.4f\t%.4f\t%.4f',...
+            nanmean(ebsd.imagequality), nanmean(ebsd.confidenceindex),...
+            nanmean(ebsd.fit));
+    elseif strcmp(type, 'emsoft')
+        fprintf(fid, 'iq\t\tci\n%.4f\t%.4f',...
+            nanmean(ebsd.iq), nanmean(ebsd.ci));        
+    else % astro
+        fprintf(fid, 'pq\t\tps\t\tmae\t\tbn\n%.4f\t%.4f\t%.4f\t%.4f',...
+            nanmean(ebsd.pq), nanmean(ebsd.ps), nanmean(ebsd.mae)/degree,...
+            nanmean(ebsd.bn));
+    end
+    fclose(fid);
 end
-fclose(fid);
 
 % Plot pattern quality
 figure
-if strcmp(type, 'ang')
-    plot(ebsd, ebsd.iq)
+if ismember(type, {'ang', 'emsoft'})
+    [~, mP] = plot(ebsd, ebsd.iq);
     fname = 'quality_iq.png';
 elseif strcmp(type, 'osc')
-    plot(ebsd, ebsd.imagequality)
+    [~, mP] = plot(ebsd, ebsd.imagequality);
     fname = 'quality_iq.png';
 else % astro
-    plot(ebsd, ebsd.pq)
+    [~, mP] = plot(ebsd, ebsd.pq);
     fname = 'quality_pq.png';
 end
 mtexColorMap black2white
-mtexColorbar
-export_fig(fullfile(out_path, fname), res);
+if colorbar
+    mtexColorbar
+end
+if ~scalebar
+    mP.micronBar.visible = 'off';
+end
+if save
+    export_fig(fullfile(out_path, fname), res);
+end
 
 % Plot confidence index
 figure
-if strcmp(type, 'ang')
-    plot(ebsd, ebsd.ci)
+if ismember(type, {'ang', 'emsoft'})
+    [~, mP] = plot(ebsd, ebsd.ci);
     fname = 'quality_ci.png';
 elseif strcmp(type, 'osc')
-    plot(ebsd, ebsd.confidenceindex)
+    [~, mP] = plot(ebsd, ebsd.confidenceindex);
     fname = 'quality_ci.png';
 else % astro
-    plot(ebsd, ebsd.ps)
+    [~, mP] = plot(ebsd, ebsd.ps);
     fname = 'quality_ps.png';
 end
 mtexColorMap black2white
-mtexColorbar
-export_fig(fullfile(out_path, fname), res);
+if colorbar
+    mtexColorbar
+end
+if ~scalebar
+    mP.micronBar.visible = 'off';
+end
+if save
+    export_fig(fullfile(out_path, fname), res);
+end
 
 % Plot pattern fit
-figure
 if strcmp(type, 'astro')
-    plot(ebsd, ebsd.mae)
+    figure
+    [~, mP] = plot(ebsd, ebsd.mae);
     fname = 'quality_mae.png';
-else % ang or osc
-    plot(ebsd, ebsd.fit)
+elseif ismember(type, {'ang', 'osc'})
+    figure
+    [~, mP] = plot(ebsd, ebsd.fit);
     fname = 'quality_fit.png';
 end
-mtexColorMap white2black
-mtexColorbar
-export_fig(fullfile(out_path, fname), res);
+if ismember(type, {'ang', 'osc', 'astro'})
+    mtexColorMap white2black
+    if colorbar
+        mtexColorbar
+    end
+    if ~scalebar
+        mP.micronBar.visible = 'off';
+    end
+    if save
+        export_fig(fullfile(out_path, fname), res);
+    end
+end
 
 % Plot kernel average misorientation
 kam = KAM(ebsd, 'threshold', 2*degree);
 
 figure
-plot(ebsd,kam./degree)
-mtexColorbar
-export_fig(fullfile(out_path, 'quality_kam.png'), res);
+[~, mP] = plot(ebsd,kam./degree);
+if colorbar
+    mtexColorbar
+end
+if ~scalebar
+    mP.micronBar.visible = 'off';
+end
+if save
+    export_fig(fullfile(out_path, 'quality_kam.png'), res);
+end
 
 end

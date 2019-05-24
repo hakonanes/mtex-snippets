@@ -7,16 +7,19 @@ function ebsd_plot_orientation_maps(ebsd, out_path, varargin)
 %  out_path - path to output directory
 %
 % Options
-%  type - string, {'ang' (default), 'osc' or 'astro'}.
-%  mode - string, {'rd' (default), 'om', 'ipf', 'all'}
+%  save - bool, if 1 (default), write figures to file.
+%  type - string, {'ang' (default), 'osc', 'astro' or 'emsoft'}.
+%  mode - string, {'rd' (default), 'om', 'ipf', 'all'}.
 %  to_plot - bool, if 1 (default), show plots and not just save them.
+%  scalebar - bool, if 1 (default), show a scalebar.
 %
 % Assumes the indexing data file from AstroEBSD is created with the
 % astroebsd2mtex script found here (https://github.com/hwagit/mtex-snippets).
 % 
 % Assumes the following Euler directions for package types:
-%   * ang: Xeuler = image east, Zeuler = into image
-%   * osc/astro: Xeuler = image north, Zeuler = into image
+%   * ang/astro: Xeuler = image north, Zeuler = into image.
+%   * osc: Xeuler = image east, Zeuler = into image.
+%   * emsoft: Xeuler = image south, Zeuler = out of image.
 % 
 % Assumes not indexed pixels are labeled 'notIndexed'.
 %
@@ -26,16 +29,27 @@ function ebsd_plot_orientation_maps(ebsd, out_path, varargin)
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-02-25
 
 % Set default values
+save = 1;
 type = 'ang';
 mode = 'rd';
 to_plot = 1;
+scalebar = 1;
 
 % Override default values if passed to function
+if check_option(varargin, 'save')
+    save = get_option(varargin, 'save');
+end
 if check_option(varargin, 'type')
     type = get_option(varargin, 'type');
 end
 if check_option(varargin, 'mode')
     mode = get_option(varargin, 'mode');
+end
+if check_option(varargin, 'to_plot')
+    to_plot = get_option(varargin, 'to_plot');
+end
+if check_option(varargin, 'scalebar')
+    scalebar = get_option(varargin, 'scalebar');
 end
 
 % To show figures or not
@@ -48,12 +62,15 @@ end
 res = '-r200';
 
 % Set specimen directions
-if strcmp(type, 'ang') || strcmp(type, 'osc')
+if ismember(type, {'ang', 'astro'})
     setMTEXpref('xAxisDirection', 'north');
     setMTEXpref('zAxisDirection', 'intoPlane');
-else % astro
-    setMTEXpref('xAxisDirection', 'north');
+elseif strcmp(type, 'osc')
+    setMTEXpref('xAxisDirection', 'east');
     setMTEXpref('zAxisDirection', 'intoPlane');
+else % emsoft
+    setMTEXpref('xAxisDirection', 'south');
+    setMTEXpref('zAxisDirection', 'outOfPlane');
 end
 
 % Delete possible 'notIndexed' entry in crystal symmetry cell array
@@ -73,54 +90,72 @@ end
 oMs = cell(length(cs));
 for i=1:length(cs) % Iterate over crystal symmetries
     oM = ipfHSVKey(ebsd(cs{i}.mineral));
-    if strcmp(type, 'ang')
+    if ismember(type, {'ang', 'astro'})
         oM.inversePoleFigureDirection = xvector;
-    else % osc/astroebsd
+    else % osc/emsoft
         oM.inversePoleFigureDirection = yvector;
     end
     oMs{i} = oM;
 end
 
 % Plot orientation map with respect to (wrt.) RD
-if strcmp(mode, 'rd') || strcmp(mode, 'om') || strcmp(mode, 'all')
+if ismember(mode, {'rd', 'om', 'all'})
     for i=1:length(cs) % Iterate over crystal symmetries
         figure
         mineral = cs{i}.mineral;
         oM = oMs{i};
-        plot(ebsd(mineral), oM.orientation2color(ebsd(mineral).orientations));
-        export_fig(fullfile(out_path, ['omrd_' lower(mineral) '.png']), res)
+        [~, mP] = plot(ebsd(mineral),...
+            oM.orientation2color(ebsd(mineral).orientations));
+        if ~scalebar
+            mP.micronBar.visible = 'off';
+        end
+        if save
+            export_fig(fullfile(out_path, ['omrd_' lower(mineral) '.png']), res)
+        end
     end
 end
 
 % Plot remaining orientation maps
-if strcmp(mode, 'om') || strcmp(mode, 'all')
+if ismember(mode, {'om', 'all'})
     for i=1:length(cs) % Iterate over crystal symmetries
         mineral = cs{i}.mineral;
         oM = oMs{i};
 
         % OM wrt. TD
-        if strcmp(type, 'ang')
+        if ismember(type, {'ang', 'astro'})
             oM.inversePoleFigureDirection = yvector;
-        else % osc/astroebsd
+        else % osc/emsoft
             oM.inversePoleFigureDirection = xvector;
         end
         figure
-        plot(ebsd(mineral), oM.orientation2color(ebsd(mineral).orientations));
-        export_fig(fullfile(out_path, ['omtd_' lower(mineral) '.png']), res)
+        [~, mP] = plot(ebsd(mineral),...
+            oM.orientation2color(ebsd(mineral).orientations));
+        if ~scalebar
+            mP.micronBar.visible = 'off';
+        end
+        if save
+            export_fig(fullfile(out_path, ['omtd_' lower(mineral) '.png']), res)
+        end
 
         % OM wrt. ND
         oM.inversePoleFigureDirection = zvector;
         figure
-        plot(ebsd(mineral), oM.orientation2color(ebsd(mineral).orientations));
-        export_fig(fullfile(out_path, ['omnd_' lower(mineral) '.png']), res)
+        [~, mP] = plot(ebsd(mineral),...
+            oM.orientation2color(ebsd(mineral).orientations));
+        if ~scalebar
+            mP.micronBar.visible = 'off';
+        end
+        if save
+            export_fig(fullfile(out_path, ['omnd_' lower(mineral) '.png']), res)
+        end
     end
 end
 
 % Plot IPFs
 if strcmp(mode, 'ipf') || strcmp(mode, 'all')
-    if strcmp(type, 'ang')
+    if ismember(type, {'ang', 'astro'})
         directions = {xvector, yvector, zvector};
-    else % osc/astroebsd
+    else % osc/emsoft
         directions = {yvector, xvector, zvector};
     end
     fnames = {'rd', 'td', 'nd'};
@@ -136,8 +171,10 @@ if strcmp(mode, 'ipf') || strcmp(mode, 'all')
                 oM.inversePoleFigureDirection, 'markersize', 3,...
                 'markerfacecolor', 'none', 'markeredgecolor', 'k')
             hold off
-            export_fig(fullfile(out_path,...
-                ['om_ipf' fnames{j} '_' lower(mineral) '.png']), res)
+            if save
+                export_fig(fullfile(out_path,...
+                    ['om_ipf' fnames{j} '_' lower(mineral) '.png']), res)
+            end
         end
     end
 end
