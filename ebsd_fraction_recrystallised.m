@@ -10,7 +10,7 @@ function [grains, grainsSub,...
 %    Default is 3 um.
 %  critGOS - double, criterium for maximum grain orientation spread (GOS).
 %    Default is 2 degrees.
-%  critHAGB - double, criterium for minimum fraction of high angle grain
+%  critHAB - double, criterium for minimum fraction of high angle grain
 %    boundary (HAB). Default is 0.5.
 %  to_plot - bool, if 1 (default), show plot of grains.
 %  hab - double, lower bound for a high angle boundary (HAB) in
@@ -53,8 +53,8 @@ end
 if check_option(varargin, 'critGOS')
     critGOS = get_option(varargin, 'critGOS');
 end
-if check_option(varargin, 'critHAGB')
-    critHAB = get_option(varargin, 'critHAGB');
+if check_option(varargin, 'critHAB')
+    critHAB = get_option(varargin, 'critHAB');
 end
 if check_option(varargin, 'to_plot')
     to_plot = get_option(varargin, 'to_plot');

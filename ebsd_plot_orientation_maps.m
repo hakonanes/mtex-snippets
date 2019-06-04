@@ -17,10 +17,9 @@ function ebsd_plot_orientation_maps(ebsd, out_path, varargin)
 % astroebsd2mtex script found here (https://github.com/hwagit/mtex-snippets).
 % 
 % Assumes the following Euler directions for package types:
-%   * ang/astro: Xeuler = image north, Zeuler = into image.
+%   * ang/astro/emsoft: Xeuler = image north, Zeuler = into image.
 %   * osc: Xeuler = image east, Zeuler = into image.
-%   * emsoft: Xeuler = image south, Zeuler = out of image.
-% 
+%
 % Assumes not indexed pixels are labeled 'notIndexed'.
 %
 % Requires the export_fig package
@@ -62,15 +61,12 @@ end
 res = '-r200';
 
 % Set specimen directions
-if ismember(type, {'ang', 'astro'})
+if ismember(type, {'ang', 'astro', 'emsoft'})
     setMTEXpref('xAxisDirection', 'north');
     setMTEXpref('zAxisDirection', 'intoPlane');
-elseif strcmp(type, 'osc')
+else % osc
     setMTEXpref('xAxisDirection', 'east');
     setMTEXpref('zAxisDirection', 'intoPlane');
-else % emsoft
-    setMTEXpref('xAxisDirection', 'south');
-    setMTEXpref('zAxisDirection', 'outOfPlane');
 end
 
 % Delete possible 'notIndexed' entry in crystal symmetry cell array
@@ -124,8 +120,10 @@ if ismember(mode, {'om', 'all'})
         % OM wrt. TD
         if ismember(type, {'ang', 'astro'})
             oM.inversePoleFigureDirection = yvector;
-        else % osc/emsoft
+        elseif strcmp(type, 'osc')
             oM.inversePoleFigureDirection = xvector;
+        else % emsoft
+            oM.inversePoleFigureDirection = zvector;
         end
         figure
         [~, mP] = plot(ebsd(mineral),...
@@ -138,7 +136,12 @@ if ismember(mode, {'om', 'all'})
         end
 
         % OM wrt. ND
-        oM.inversePoleFigureDirection = zvector;
+        if strcmp(type, 'emsoft')
+            oM.inversePoleFigureDirection = xvector;
+        else % ang/astro/osc
+            oM.inversePoleFigureDirection = zvector;
+        end
+        
         figure
         [~, mP] = plot(ebsd(mineral),...
             oM.orientation2color(ebsd(mineral).orientations));
@@ -155,8 +158,10 @@ end
 if strcmp(mode, 'ipf') || strcmp(mode, 'all')
     if ismember(type, {'ang', 'astro'})
         directions = {xvector, yvector, zvector};
-    else % osc/emsoft
+    elseif strcmp(type, 'osc')
         directions = {yvector, xvector, zvector};
+    else % emsoft
+        directions = {yvector, zvector, xvector};
     end
     fnames = {'rd', 'td', 'nd'};
     for i=1:length(cs) % Iterate over crystal symmetries

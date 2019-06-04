@@ -17,9 +17,8 @@ function ebsd_check_quality(ebsd, out_path, varargin)
 % astroebsd2mtex script found here (https://github.com/hwagit/mtex-snippets).
 % 
 % Assumes the following Euler directions for package types:
-%   * ang/astro: Xeuler = image north, Zeuler = into image.
+%   * ang/astro/emsoft: Xeuler = image north, Zeuler = into image.
 %   * osc: Xeuler = image east, Zeuler = into image.
-%   * emsoft: Xeuler = image south, Zeuler = out of image.
 %
 % Requires the export_fig package to write figures to file
 % (https://se.mathworks.com/matlabcentral/fileexchange/23629-export_fig).
@@ -60,15 +59,12 @@ end
 res = '-r200';
 
 % Set specimen directions
-if ismember(type, {'ang', 'astro'})
+if ismember(type, {'ang', 'astro', 'emsoft'})
     setMTEXpref('xAxisDirection', 'north');
     setMTEXpref('zAxisDirection', 'intoPlane');
-elseif strcmp(type, 'osc')
+else strcmp(type, 'osc')
     setMTEXpref('xAxisDirection', 'east');
     setMTEXpref('zAxisDirection', 'intoPlane');
-else % emsoft
-    setMTEXpref('xAxisDirection', 'south');
-    setMTEXpref('zAxisDirection', 'outOfPlane');
 end
 
 % Write mean values for index and reliability to file

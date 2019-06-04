@@ -66,3 +66,7 @@ Example usage:
 ### ebsd_write_data_to_file
 
 A collection of functions writing data (for example grain data) to .csv files.
+
+### indexing_success_rate
+
+Calculate an indexing success rate (ISR) value by comparing a given EBSD scan to a reference scan. An orientation in the comparison scan is compared against any of the orientations in the kernel of neighbouring points in the reference scan. See Wright, Stuart I., Nowell, Matthew M., Lindeman, Scott P., Camus, Patrick P., De Graef, Marc, Jackson, Michael A.: Introduction and comparison of new EBSD post-processing methodologies , Ultramicroscopy 159(P1), Elsevier, 81–94, 2015 for details.
