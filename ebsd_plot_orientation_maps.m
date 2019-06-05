@@ -8,17 +8,13 @@ function ebsd_plot_orientation_maps(ebsd, out_path, varargin)
 %
 % Options
 %  save - bool, if 1 (default), write figures to file.
-%  type - string, {'ang' (default), 'osc', 'astro' or 'emsoft'}.
-%  mode - string, {'rd' (default), 'om', 'ipf', 'all'}.
+%  mode - string, {'x' (default), 'om', 'ipf', 'all'}.
 %  to_plot - bool, if 1 (default), show plots and not just save them.
 %  scalebar - bool, if 1 (default), show a scalebar.
 %
-% Assumes the indexing data file from AstroEBSD is created with the
-% astroebsd2mtex script found here (https://github.com/hwagit/mtex-snippets).
-% 
-% Assumes the following Euler directions for package types:
-%   * ang/astro/emsoft: Xeuler = image north, Zeuler = into image.
-%   * osc: Xeuler = image east, Zeuler = into image.
+% Uses the global reference frame set by the user by for example:
+%   setMTEXpref('xAxisDirection', 'east')
+%   setMTEXpref('zAxisDirection', 'intoPlane')
 %
 % Assumes not indexed pixels are labeled 'notIndexed'.
 %
@@ -29,17 +25,13 @@ function ebsd_plot_orientation_maps(ebsd, out_path, varargin)
 
 % Set default values
 save = 1;
-type = 'ang';
-mode = 'rd';
+mode = 'x';
 to_plot = 1;
 scalebar = 1;
 
 % Override default values if passed to function
 if check_option(varargin, 'save')
     save = get_option(varargin, 'save');
-end
-if check_option(varargin, 'type')
-    type = get_option(varargin, 'type');
 end
 if check_option(varargin, 'mode')
     mode = get_option(varargin, 'mode');
@@ -60,15 +52,6 @@ end
 % Image resolution
 res = '-r200';
 
-% Set specimen directions
-if ismember(type, {'ang', 'astro', 'emsoft'})
-    setMTEXpref('xAxisDirection', 'north');
-    setMTEXpref('zAxisDirection', 'intoPlane');
-else % osc
-    setMTEXpref('xAxisDirection', 'east');
-    setMTEXpref('zAxisDirection', 'intoPlane');
-end
-
 % Delete possible 'notIndexed' entry in crystal symmetry cell array
 cs = ebsd.CS;
 if isa(cs, 'cell')
@@ -86,16 +69,13 @@ end
 oMs = cell(length(cs));
 for i=1:length(cs) % Iterate over crystal symmetries
     oM = ipfHSVKey(ebsd(cs{i}.mineral));
-    if ismember(type, {'ang', 'astro'})
-        oM.inversePoleFigureDirection = xvector;
-    else % osc/emsoft
-        oM.inversePoleFigureDirection = yvector;
-    end
+    oM.inversePoleFigureDirection = xvector;
     oMs{i} = oM;
 end
 
-% Plot orientation map with respect to (wrt.) RD
-if ismember(mode, {'rd', 'om', 'all'})
+% Plot orientation map with respect to (wrt.) crystal reference frame
+% direction Xc (or RD in TSL)
+if ismember(mode, {'x', 'om', 'all'})
     for i=1:length(cs) % Iterate over crystal symmetries
         figure
         mineral = cs{i}.mineral;
@@ -106,7 +86,7 @@ if ismember(mode, {'rd', 'om', 'all'})
             mP.micronBar.visible = 'off';
         end
         if save
-            export_fig(fullfile(out_path, ['omrd_' lower(mineral) '.png']), res)
+            export_fig(fullfile(out_path, ['omxc_' lower(mineral) '.png']), res)
         end
     end
 end
@@ -117,14 +97,8 @@ if ismember(mode, {'om', 'all'})
         mineral = cs{i}.mineral;
         oM = oMs{i};
 
-        % OM wrt. TD
-        if ismember(type, {'ang', 'astro'})
-            oM.inversePoleFigureDirection = yvector;
-        elseif strcmp(type, 'osc')
-            oM.inversePoleFigureDirection = xvector;
-        else % emsoft
-            oM.inversePoleFigureDirection = zvector;
-        end
+        % OM wrt. crystal reference frame direction Yc (or TD in TSL)
+        oM.inversePoleFigureDirection = yvector;
         figure
         [~, mP] = plot(ebsd(mineral),...
             oM.orientation2color(ebsd(mineral).orientations));
@@ -132,16 +106,11 @@ if ismember(mode, {'om', 'all'})
             mP.micronBar.visible = 'off';
         end
         if save
-            export_fig(fullfile(out_path, ['omtd_' lower(mineral) '.png']), res)
+            export_fig(fullfile(out_path, ['omyc_' lower(mineral) '.png']), res)
         end
 
-        % OM wrt. ND
-        if strcmp(type, 'emsoft')
-            oM.inversePoleFigureDirection = xvector;
-        else % ang/astro/osc
-            oM.inversePoleFigureDirection = zvector;
-        end
-        
+        % OM wrt. crystal reference frame direction Zc (or ND in TSL)
+        oM.inversePoleFigureDirection = zvector;
         figure
         [~, mP] = plot(ebsd(mineral),...
             oM.orientation2color(ebsd(mineral).orientations));
@@ -149,21 +118,15 @@ if ismember(mode, {'om', 'all'})
             mP.micronBar.visible = 'off';
         end
         if save
-            export_fig(fullfile(out_path, ['omnd_' lower(mineral) '.png']), res)
+            export_fig(fullfile(out_path, ['omzc_' lower(mineral) '.png']), res)
         end
     end
 end
 
 % Plot IPFs
 if strcmp(mode, 'ipf') || strcmp(mode, 'all')
-    if ismember(type, {'ang', 'astro'})
-        directions = {xvector, yvector, zvector};
-    elseif strcmp(type, 'osc')
-        directions = {yvector, xvector, zvector};
-    else % emsoft
-        directions = {yvector, zvector, xvector};
-    end
-    fnames = {'rd', 'td', 'nd'};
+    directions = {xvector, yvector, zvector};
+    fnames = {'xc', 'yc', 'zc'};
     for i=1:length(cs) % Iterate over crystal symmetries
         oM = oMs{i};
         mineral = cs{i}.mineral;
