@@ -11,7 +11,7 @@ function ebsd = emsoft_reader(file, cs, refined)
 %  refined - whether HDF5 data set RefinedEulerAngles or EulerAngles should
 %    be read
 %
-% Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-02-21
+% Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-06-26
 
 % Setup
 dataset = '/Scan 1/EBSD/';

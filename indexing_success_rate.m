@@ -1,5 +1,5 @@
 function [isr_rk, within_threshold_all] = indexing_success_rate(ebsd_comp,...
-    ebsd_ref, varargin)
+    ebsd_ref, out_path, varargin)
 % INDEXING_SUCCESS_RATE Calculate an indexing success rate (ISR) value by
 % comparing a given EBSD scan to a reference scan. An orientation in the
 % comparison scan is compared against any of the orientations in the kernel
@@ -13,12 +13,12 @@ function [isr_rk, within_threshold_all] = indexing_success_rate(ebsd_comp,...
 % Input
 %  ebsd_comp - @EBSD object, comparison scan
 %  ebsd_ref - @EBSD object, reference scan
-%  type - string, {'ang' (default), 'osc', 'astro' or 'emsoft'}
+%  out_path - full path to directory to write indexing success rate map to
 %
 % Output
+%  isr_rk - indexing success rate
 %  within_threshold_all - boolean map with pixels within deviation set to
 %    true
-%  isr_rk - indexing success rate
 %
 % Options
 %  deviation - double, maximum deviation angle to consider match, default is 5
@@ -87,12 +87,11 @@ for i=1:nx
 end
 close(h)
 
+% Calculate ISR_RK and write it to command line
 isr_rk = sum(within_threshold_all, 'all') / numel(within_threshold_all);
 fprintf('ISR_RK = %.4f\n', isr_rk)
 
-% Plot to check
-figure
-imagesc(within_threshold_all)
-colormap bone
+% Write map to file
+dlmwrite(fullfile(out_path, 'isr_map.txt'), within_threshold_all)
 
 end
