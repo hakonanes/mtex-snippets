@@ -144,6 +144,54 @@ if ismember(type, {'ang', 'osc', 'astro'})
     end
 end
 
+% Plot orientation similarity metric
+if strcmp(type, 'emsoft')
+    [~, mP] = plot(ebsd, ebsd.osm);
+    fname = 'quality_osm.png';
+end
+mtexColorMap black2white
+if colorbar
+    mtexColorbar
+end
+if ~scalebar
+    mP.micronBar.visible = 'off';
+end
+if save
+    export_fig(fullfile(out_path, fname), res);
+end
+
+% Plot ISM
+if strcmp(type, 'emsoft')
+    [~, mP] = plot(ebsd, ebsd.ism);
+    fname = 'quality_ism.png';
+end
+mtexColorMap black2white
+if colorbar
+    mtexColorbar
+end
+if ~scalebar
+    mP.micronBar.visible = 'off';
+end
+if save
+    export_fig(fullfile(out_path, fname), res);
+end
+
+% Plot average dot product
+if strcmp(type, 'emsoft')
+    [~, mP] = plot(ebsd, ebsd.adp);
+    fname = 'quality_adp.png';
+end
+mtexColorMap black2white
+if colorbar
+    mtexColorbar
+end
+if ~scalebar
+    mP.micronBar.visible = 'off';
+end
+if save
+    export_fig(fullfile(out_path, fname), res);
+end
+
 % Plot kernel average misorientation
 kam = KAM(ebsd, 'threshold', 2*degree);
 

@@ -1,4 +1,5 @@
-function isr_rk = indexing_success_rate(ebsd_comp, ebsd_ref, varargin)
+function [isr_rk, within_threshold_all] = indexing_success_rate(ebsd_comp,...
+    ebsd_ref, varargin)
 % INDEXING_SUCCESS_RATE Calculate an indexing success rate (ISR) value by
 % comparing a given EBSD scan to a reference scan. An orientation in the
 % comparison scan is compared against any of the orientations in the kernel
@@ -10,15 +11,18 @@ function isr_rk = indexing_success_rate(ebsd_comp, ebsd_ref, varargin)
 % 81–94, 2015 for details.
 %
 % Input
-%  ebsd_comp - @EBSD object, comparison scan.
-%  ebsd_ref - @EBSD object, reference scan.
-%  type - string, {'ang' (default), 'osc', 'astro' or 'emsoft'}.
+%  ebsd_comp - @EBSD object, comparison scan
+%  ebsd_ref - @EBSD object, reference scan
+%  type - string, {'ang' (default), 'osc', 'astro' or 'emsoft'}
+%
+% Output
+%  within_threshold_all - boolean map with pixels within deviation set to
+%    true
+%  isr_rk - indexing success rate
 %
 % Options
-%  kernel_size - int, width and height of kernel, default is 3 (only nearest
-%    neighbour orientations are considered).
 %  deviation - double, maximum deviation angle to consider match, default is 5
-%    degrees.
+%    degrees
 %
 % Requires the export_fig package to write figures to file
 % (https://se.mathworks.com/matlabcentral/fileexchange/23629-export_fig).
@@ -26,14 +30,10 @@ function isr_rk = indexing_success_rate(ebsd_comp, ebsd_ref, varargin)
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-05-10
 
 % Set default values
-kernel_size = 3;
 deviation = 5;
 type = 'ang';
 
 % Override default values if passed to function
-if check_option(varargin, 'kernel_size')
-    kernel_size = get_option(varargin, 'kernel_size');
-end
 if check_option(varargin, 'deviation')
     deviation = get_option(varargin, 'deviation');
 end
