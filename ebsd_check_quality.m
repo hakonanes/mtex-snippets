@@ -207,4 +207,9 @@ if save
     export_fig(fullfile(out_path, 'quality_kam.png'), res);
 end
 
+% Revert change
+if ~to_plot
+    set(0, 'DefaultFigureVisible', 'on')
+end
+
 end

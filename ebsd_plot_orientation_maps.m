@@ -147,4 +147,9 @@ if strcmp(mode, 'ipf') || strcmp(mode, 'all')
     end
 end
 
+% Revert change
+if ~to_plot
+    set(0, 'DefaultFigureVisible', 'on')
+end
+
 end
