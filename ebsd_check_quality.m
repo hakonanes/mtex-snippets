@@ -45,7 +45,8 @@ if check_option(varargin, 'colorbar')
     colorbar = get_option(varargin, 'colorbar');
 end
 
-% To show figures or not
+% To show figures or not. Get current setting to revert at the end.
+figure_visible = get(0, 'DefaultFigureVisible');
 set(0, 'DefaultFigureVisible', 'on')
 if ~to_plot
     set(0, 'DefaultFigureVisible', 'off')
@@ -208,8 +209,6 @@ if save
 end
 
 % Revert change
-if ~to_plot
-    set(0, 'DefaultFigureVisible', 'on')
-end
+set(0, 'DefaultFigureVisible', figure_visible)
 
 end

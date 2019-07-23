@@ -43,7 +43,8 @@ if check_option(varargin, 'scalebar')
     scalebar = get_option(varargin, 'scalebar');
 end
 
-% To show figures or not
+% To show figures or not. Get current setting to revert at the end.
+figure_visible = get(0, 'DefaultFigureVisible');
 set(0, 'DefaultFigureVisible', 'on')
 if ~to_plot
     set(0, 'DefaultFigureVisible', 'off')
@@ -148,8 +149,6 @@ if strcmp(mode, 'ipf') || strcmp(mode, 'all')
 end
 
 % Revert change
-if ~to_plot
-    set(0, 'DefaultFigureVisible', 'on')
-end
+set(0, 'DefaultFigureVisible', figure_visible)
 
 end
