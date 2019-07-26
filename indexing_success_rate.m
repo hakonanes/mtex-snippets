@@ -23,12 +23,15 @@ function [isr_rk, within_threshold_all] = indexing_success_rate(ebsd_comp,...
 % Options
 %  deviation - double, maximum deviation angle to consider match, default is 5
 %    degrees
+%  out_file - file name of output isr map text file (without file ending
+%    '.txt'), default is 'isr_map'
 %
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-05-10
 
 % Set default values
 deviation = 5;
 type = 'ang';
+out_file = 'isr_map';
 
 % Override default values if passed to function
 if check_option(varargin, 'deviation')
@@ -36,6 +39,9 @@ if check_option(varargin, 'deviation')
 end
 if check_option(varargin, 'type')
     type = get_option(varargin, 'type');
+end
+if check_option(varargin, 'out_file')
+    out_file = get_option(varargin, 'out_file');
 end
 
 % Gridify data sets
@@ -89,6 +95,6 @@ isr_rk = sum(within_threshold_all, 'all') / numel(within_threshold_all);
 fprintf('ISR_RK = %.4f\n', isr_rk)
 
 % Write map to file
-dlmwrite(fullfile(out_path, 'isr_map.txt'), within_threshold_all)
+dlmwrite(fullfile(out_path, [out_file '.txt']), within_threshold_all)
 
 end
