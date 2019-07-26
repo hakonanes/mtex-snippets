@@ -24,9 +24,6 @@ function [isr_rk, within_threshold_all] = indexing_success_rate(ebsd_comp,...
 %  deviation - double, maximum deviation angle to consider match, default is 5
 %    degrees
 %
-% Requires the export_fig package to write figures to file
-% (https://se.mathworks.com/matlabcentral/fileexchange/23629-export_fig).
-%
 % Created by Håkon Wiik Ånes (hakon.w.anes@ntnu.no), 2019-05-10
 
 % Set default values
