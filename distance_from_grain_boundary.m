@@ -3,7 +3,8 @@ function [data] = distance_from_grain_boundary(data, boundaries, varargin)
 % distance in pixels of each measurement to a grain boundary as a property.
 % Whether the measurement is a boundary or not is also included as a property
 % to the @EBSD object. Edge boundaries are excluded for the distance
-% calculation.
+% calculation. If a misorientation signifying a high angle boundary
+% threshold is passed, the same is also done for these boundaries.
 % 
 % Input
 %  data - @EBSD object
