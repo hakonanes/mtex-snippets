@@ -8,17 +8,17 @@ A collection of scripts and convenience functions I use for processing and analy
 
 Write output data from an AstroEBSD .mat-file to a format readable by MTEX.
 
-### sped_calc_gnd
+### distance_from_grain_boundary
 
-Convenience function for estimating geometrically necessary dislocation (GND) densities from orientation data obtained from (scanning) precession electron diffraction (S)PED patterns. Plots and writes a GND density map and writes the data to a new file.
+Return an @EBSD object with the euclidian distance in pixels of each measurement to a grain boundary as a property. Whether the measurement is a boundary or not is also included as a property to the @EBSD object. Edge boundaries are excluded for the distance calculation.
 
 ### export2ang
 
-Create a new TSL .ang file from an `@EBSD` object by copying the original .ang file header and exporting the object's data to the file.
+Create a new TSL .ang file from an @EBSD object by copying the original .ang file header and exporting the object's data to the file.
 
 ### ebsd_check_quality
 
-Check quality of indexing of EBSD data.
+Check quality of indexing of Kikuchi diffraction patterns.
 
 ### ebsd_plot_orientation_maps
 
@@ -26,7 +26,7 @@ Plot orientation maps and/or inverse pole figure density plots from EBSD data an
 
 ### ebsd_fraction_hab
 
-Calculate the fraction of each grain's boundary that has a given high angle misorientation to its surrounding grains. Returns a new `@grain2d` object, containing only indexed grains, with a `Xhab` property. Can also plot a map of grains with grain colour corresponding to `Xhab`.
+Calculate the fraction of each grain's boundary that has a given high angle misorientation to its surrounding grains.
 
 ### ebsd_fraction_recrystallised
 
@@ -62,3 +62,7 @@ Calculate an indexing success rate (ISR) value by comparing a given EBSD scan to
 ### emsoft_reader
 
 Read orientation data from dictionary indexing results in the EMsoft HDF5 format into an MTEX @EBSD object. Supports single phase results only.
+
+### write_orientations_to_ang
+
+Write orientation data from a SPED data set to a text file in the ANG format used by NanoMegas' ASTAR and EDAX TSL.
