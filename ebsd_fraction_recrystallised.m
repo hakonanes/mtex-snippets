@@ -40,7 +40,7 @@ function [grains, grainsSub,...
 
 % Set default values
 critECD = 3; % [um]
-critGOS = 2; % [degrees]
+critGOS = 2*degree; % [degrees]
 critHAB = 0.5; % fraction
 to_plot = 1;
 hab = 15;

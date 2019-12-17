@@ -41,7 +41,7 @@ end
 close(h)
 
 % Calculate distance in pixels from boundary segment
-bw = data.isBoundary;
+bw = data.prop.isBoundary;
 bw = reshape(bw, data.gridify.size);
 data.prop.distanceFromBoundary = bwdist(bw);
 

@@ -10,7 +10,7 @@ Write output data from an AstroEBSD .mat-file to a format readable by MTEX.
 
 ### distance_from_grain_boundary
 
-Return an @EBSD object with the euclidian distance in pixels of each measurement to a grain boundary as a property. Whether the measurement is a boundary or not is also included as a property to the @EBSD object. Edge boundaries are excluded for the distance calculation.
+Return an @EBSD object with the euclidian distance in pixels of each measurement to a grain boundary as a property. Whether the measurement is a boundary or not is also included as a property to the @EBSD object. Edge boundaries are excluded for the distance calculation. If a misorientation signifying a high angle boundary threshold is passed, the same is also done for these boundaries.
 
 ### export2ang
 
@@ -61,7 +61,7 @@ Calculate an indexing success rate (ISR) value by comparing a given EBSD scan to
 
 ### emsoft_reader
 
-Read orientation data from dictionary indexing results in the EMsoft HDF5 format into an MTEX @EBSD object. Supports single phase results only.
+Read orientation data from dictionary indexing results in the EMsoft HDF5 format into an MTEX @EBSD object.
 
 ### write_orientations_to_ang
 

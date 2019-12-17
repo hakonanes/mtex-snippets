@@ -54,6 +54,6 @@ rot = rotation.byEuler(euler(1, :)', euler(2, :)', euler(3, :)');
 phases = h5read(file, fullfile(dataset, 'Data/Phase'));
 
 % Write to EBSD object
-ebsd = EBSD(rot, phases, cs, 'options', props);
+ebsd = EBSD(rot, phases, cs, props);
 
 end

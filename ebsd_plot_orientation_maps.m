@@ -54,7 +54,7 @@ end
 res = '-r200';
 
 % Delete possible 'notIndexed' entry in crystal symmetry cell array
-cs = ebsd.CS;
+cs = ebsd.CSList;
 if isa(cs, 'cell')
     for i=1:length(cs)
         if strcmpi(cs{i}, 'notindexed')
